@@ -37,3 +37,10 @@ CREATE TABLE `professor` (
   `celular` varchar(14) NOT NULL,
   PRIMARY KEY (`matricula`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `responsavel` (
+  `cpf_responsavel` int(11) NOT NULL,
+  `nome` varchar(50) DEFAULT NULL,
+  `data_nascimento` date DEFAULT NULL,
+  PRIMARY KEY (`cpf_responsavel`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
