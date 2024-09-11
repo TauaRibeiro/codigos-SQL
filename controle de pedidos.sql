@@ -16,15 +16,12 @@ CREATE TABLE `cliente` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `itempedido` (
-  `id_cliente` int(11) NOT NULL,
   `id_produto` int(11) NOT NULL,
   `valor_unitario_produto` decimal(10,2) DEFAULT NULL,
   `quantidade_produto` int(11) DEFAULT NULL,
   `id_pedidos` int(11) NOT NULL,
-  PRIMARY KEY (`id_cliente`,`id_produto`,`id_pedidos`),
-  KEY `fk_produto_itempedido` (`id_produto`),
+  PRIMARY KEY (`id_produto`,`id_pedidos`),
   KEY `fk_pedidos_itempedido_idx` (`id_pedidos`),
-  CONSTRAINT `fk_cliente_itempedido` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
   CONSTRAINT `fk_pedidos_itempedido` FOREIGN KEY (`id_pedidos`) REFERENCES `pedidos` (`id_pedido`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_produto_itempedido` FOREIGN KEY (`id_produto`) REFERENCES `produto` (`id_produto`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -35,6 +32,7 @@ CREATE TABLE `pedidos` (
   `data_pedido` date DEFAULT NULL,
   `valor_total_pedido` decimal(10,2) DEFAULT NULL,
   PRIMARY KEY (`id_pedido`),
+  KEY `fk_itempedido_pedidos_idx` (`id_pedido`,`id_cliente`),
   KEY `fk_cliente_pedidos` (`id_cliente`),
   CONSTRAINT `fk_cliente_pedidos` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -58,4 +56,3 @@ CREATE TABLE `produto` (
   KEY `fk_categoria_produto` (`id_categoria`),
   CONSTRAINT `fk_categoria_produto` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
