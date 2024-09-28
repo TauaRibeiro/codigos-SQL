@@ -11,6 +11,29 @@ CREATE TABLE `autor` (
   PRIMARY KEY (`id_autor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`autor` (`id_autor`,`nome`, `nacionalidade`, `data_nascimento`, `biografia`)
+VALUES 
+('1', 'Machado de Assis', 'Brasileiro', '1839-06-21', 'Um dos maiores escritores da literatura brasileira.'),
+('2', 'Clarice Lispector', 'Brasileira', '1920-12-10', 'Escritora modernista famosa por suas obras introspectivas.'),
+('3', 'Jorge Amado', 'Brasileiro', '1912-08-10', 'Famoso por suas obras que retratam o nordeste brasileiro.'),
+('4', 'Paulo Coelho', 'Brasileiro', '1947-08-24', 'Autor de O Alquimista, uma das obras brasileiras mais vendidas no mundo.'),
+('5', 'José Saramago', 'Português', '1922-11-16', 'Ganhador do Nobel de Literatura, conhecido por obras como Ensaio Sobre a Cegueira.'),
+('6', 'Gabriel García Márquez', 'Colombiano', '1927-03-06', 'Autor de Cem Anos de Solidão e ganhador do Nobel de Literatura.'),
+('7', 'Jane Austen', 'Britânica', '1775-12-16', 'Autora de Orgulho e Preconceito, conhecida por retratar a sociedade britânica do século XIX.'),
+('8', 'Leo Tolstoy', 'Russo', '1828-09-09', 'Escritor de Guerra e Paz e Anna Karenina, ícone da literatura russa.'),
+('9', 'Haruki Murakami', 'Japonês', '1949-01-12', 'Escritor contemporâneo conhecido por suas histórias surrealistas.'),
+('10', 'J.K. Rowling', 'Britânica', '1965-07-31', 'Autora da famosa série Harry Potter.');
+
+SELECT * FROM `biblioteca`.`autor`;
+SELECT * FROM `biblioteca`.`autor` WHERE(`nacionalidade` = 'Brasileiro');
+
+UPDATE `biblioteca`.`autor` SET `data_nascimento` = '1839-06-21' WHERE(`id_autor` = '1');
+UPDATE `biblioteca`.`autor` SET `data_nascimento` = '1839-06-21';
+
+DELETE FROM `biblioteca`.`autor`;
+DELETE FROM `biblioteca`.`autor` WHERE `id_autor` = '10';
+COMMIT;
+
 CREATE TABLE `autor_livro` (
   `id_livro` int(11) NOT NULL,
   `id_autor` int(11) NOT NULL,
@@ -27,12 +50,49 @@ CREATE TABLE `categoria` (
   PRIMARY KEY (`id_categoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`categoria` (`id_categoria`, `nome`, `descricao`)
+VALUES 
+('1', 'Ficção', 'Obras que tratam de eventos e personagens imaginários.'),
+('2', 'Não-Ficção', 'Livros baseados em fatos reais.'),
+('3', 'Romance', 'Obras literárias focadas em histórias de amor e relacionamentos.'),
+('4', 'Fantasia', 'Histórias com elementos mágicos ou sobrenaturais.'),
+('5', 'Biografia', 'Relatos sobre a vida de pessoas notáveis.'),
+('6', 'História', 'Obras que tratam de eventos históricos.'),
+('7', 'Ciência', 'Livros focados em temas científicos e acadêmicos.'),
+('8', 'Suspense', 'Obras que geram tensão e mistério.'),
+('9', 'Poesia', 'Coletâneas de poemas e versos literários.'),
+('10', 'Autoajuda', 'Livros que têm como objetivo o desenvolvimento pessoal e emocional.');
+
+SELECT * FROM `biblioteca`.`categoria`;
+SELECT * FROM `biblioteca`.`categoria` WHERE (`id_categoria` = 5);
+
+UPDATE `biblioteca`.`categoria` SET `nome` = 'Teste';
+UPDATE `biblioteca`.`categoria` SET `nome` = 'Teste' WHERE (`id_categoria` = '1');
+
+DELETE FROM `biblioteca`.`categoria`;
+DELETE FROM `biblioteca`.`categoria` WHERE (`id_categoria` = 10);
+
+COMMIT;
+
 CREATE TABLE `devolucao` (
   `id_devolucao` int(11) NOT NULL AUTO_INCREMENT,
   `data_devolucao` date NOT NULL,
   `valor_multa` double NOT NULL,
   PRIMARY KEY (`id_devolucao`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `biblioteca`.`devolucao` (`data_devolucao`, `valor_multa`)
+VALUES 
+('2022-09-01', 5.00),
+('2022-09-15', 2.50),
+('2022-10-01', 0.00),
+('2022-10-15', 1.75),
+('2022-11-01', 3.50),
+('2022-11-15', 0.00),
+('2022-12-01', 4.25),
+('2022-12-15', 1.00),
+('2023-01-01', 0.00),
+('2023-01-15', 6.00);
 
 CREATE TABLE `emprestimo` (
   `id_emprestimo` int(11) NOT NULL AUTO_INCREMENT,
@@ -49,10 +109,22 @@ CREATE TABLE `emprestimo` (
   CONSTRAINT `fk_usuario_livro` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`emprestimo` (`id_usuario`, `id_livro`, `status`, `id_devolucao`)
+VALUES 
+(1, 1, 'Devolvido', 1),
+(2, 2, 'Devolvido', 2),
+(3, 3, 'Em andamento', 3),
+(4, 4, 'Devolvido', 4),
+(5, 5, 'Em atraso', 5),
+(6, 6, 'Em andamento', 6),
+(7, 7, 'Devolvido', 7),
+(8, 8, 'Em atraso', 8),
+(9, 9, 'Em andamento', 9),
+(10, 10, 'Devolvido', 10);
+
 CREATE TABLE `livro` (
   `id_livro` int(11) NOT NULL AUTO_INCREMENT,
   `titulo` varchar(150) NOT NULL,
-  `id_autor` int(11) NOT NULL,
   `id_categoria` int(11) NOT NULL,
   `editora` varchar(150) NOT NULL,
   `ano_publicacao` date NOT NULL,
@@ -60,11 +132,22 @@ CREATE TABLE `livro` (
   `quantidade_total` int(11) NOT NULL,
   `quantidade_disponivel` int(11) NOT NULL,
   PRIMARY KEY (`id_livro`),
-  KEY `fk_autor_livro_idx` (`id_autor`),
   KEY `fk_categoria_livro_idx` (`id_categoria`),
-  CONSTRAINT `fk_autor_livro` FOREIGN KEY (`id_autor`) REFERENCES `autor` (`id_autor`),
   CONSTRAINT `fk_categoria_livro` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `biblioteca`.`livro` (`titulo`, `id_categoria`, `editora`, `ano_publicacao`, `numero_edicao`, `quantidade_total`, `quantidade_disponivel`)
+VALUES 
+('Dom Casmurro', 1, 'Editora A', '1899-01-01', 1, 50, 30),
+('A Hora da Estrela', 1, 'Editora B', '1977-01-01', 1, 30, 20),
+('Capitães da Areia', 1, 'Editora C', '1937-01-01', 2, 40, 25),
+('O Alquimista', 4, 'Editora D', '1988-01-01', 1, 60, 40),
+('Ensaio Sobre a Cegueira', 1, 'Editora E', '1995-01-01', 1, 45, 35),
+('Cem Anos de Solidão', 4, 'Editora F', '1967-01-01', 1, 50, 40),
+('Orgulho e Preconceito', 3, 'Editora G', '1813-01-01', 2, 35, 25),
+('Guerra e Paz', 5, 'Editora H', '1869-01-01', 3, 55, 45),
+('Kafka à Beira-mar', 4, 'Editora I', '2002-01-01', 1, 40, 30),
+('Harry Potter e a Pedra Filosofal', 4, 'Editora J', '1997-01-01', 1, 100, 80);
 
 CREATE TABLE `reserva` (
   `id_reserva` int(11) NOT NULL,
@@ -79,6 +162,20 @@ CREATE TABLE `reserva` (
   CONSTRAINT `fk_usuario_reserva` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`reserva` (`id_usuario`, `id_livro`, `data_reserva`, `posicao_fila`)
+VALUES 
+(1, 1, '2023-09-01', 1),
+(2, 2, '2023-09-02', 2),
+(3, 3, '2023-09-03', 1),
+(4, 4, '2023-09-04', 2),
+(5, 5, '2023-09-05', 1),
+(6, 6, '2023-09-06', 2),
+(7, 7, '2023-09-07', 1),
+(8, 8, '2023-09-08', 2),
+(9, 9, '2023-09-09', 1),
+(10, 10, '2023-09-10', 2);
+
+
 CREATE TABLE `usuario` (
   `id_usuario` int(11) NOT NULL AUTO_INCREMENT,
   `nome` varchar(150) NOT NULL,
@@ -87,6 +184,17 @@ CREATE TABLE `usuario` (
   `telefone` varchar(11) NOT NULL,
   `data_cadastro` date NOT NULL,
   `endereco` varchar(150) NOT NULL,
-  PRIMARY KEY (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  PRIMARY KEY (`id_usuario`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`usuario` (`nome`, `tipo`, `email`, `telefone`, `data_cadastro`, `endereco`)
+VALUES 
+('João Silva', 'Leitor', 'joao.silva@example.com', '11987654321', '2020-02-10', 'Rua A, 123'),
+('Maria Souza', 'Leitor', 'maria.souza@example.com', '11987654322', '2019-07-15', 'Rua B, 456'),
+('Carlos Pereira', 'Leitor', 'carlos.pereira@example.com', '11987654323', '2021-03-22', 'Rua C, 789'),
+('Ana Oliveira', 'Leitor', 'ana.oliveira@example.com', '11987654324', '2021-01-05', 'Rua D, 101'),
+('Pedro Lima', 'Leitor', 'pedro.lima@example.com', '11987654325', '2020-08-19', 'Rua E, 202'),
+('Fernanda Costa', 'Bibliotecário', 'fernanda.costa@example.com', '11987654326', '2018-11-11', 'Rua F, 303'),
+('Lucas Alves', 'Leitor', 'lucas.alves@example.com', '11987654327', '2020-12-08', 'Rua G, 404'),
+('Juliana Lima', 'Leitor', 'juliana.lima@example.com', '11987654328', '2021-05-30', 'Rua H, 505'),
+('Roberto Nunes', 'Bibliotecário', 'roberto.nunes@example.com', '11987654329', '2018-03-17', 'Rua I, 606'),
+('Beatriz Melo', 'Leitor', 'beatriz.melo@example.com', '11987654330', '2019-10-25', 'Rua J, 707');
