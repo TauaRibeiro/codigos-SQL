@@ -34,6 +34,7 @@ DELETE FROM `biblioteca`.`autor`;
 DELETE FROM `biblioteca`.`autor` WHERE `id_autor` = '10';
 COMMIT;
 
+-- Esqueci de adicionar o CRUD desse campo
 CREATE TABLE `autor_livro` (
   `id_livro` int NOT NULL,
   `id_autor` int NOT NULL,
@@ -43,6 +44,29 @@ CREATE TABLE `autor_livro` (
   FOREIGN KEY (`id_livro`) REFERENCES `livro` (`id_livro`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+INSERT INTO `biblioteca`.`autor_livro`(`id_livro`, `id_autor`)
+VALUES
+(1, 10),
+(2, 3),
+(3, 3),
+(4, 8),
+(5, 1),
+(6, 8),
+(7, 10),
+(8, 8),
+(9, 10),
+(10, 1);
+
+SELECT * FROM `biblioteca`.`autor_livro`;
+SELECT * FROM `biblioteca`.`autor_livro` WHERE(`id_livro` = 1);
+
+UPDATE `biblioteca`.`autor_livro` SET `id_autor` = 5;
+UPDATE `biblioteca`.`autor_livro` SET `id_autor` = 5 WHERE (`id_livro` = 3);
+
+DELETE FROM `biblioteca`.`autor_livro`;
+DELETE FROM `biblioteca`.`autor_livro` WHERE(`id_livro` = 10);
+
+COMMIT;
 
 CREATE TABLE `categoria` (
   `id_categoria` int NOT NULL,
