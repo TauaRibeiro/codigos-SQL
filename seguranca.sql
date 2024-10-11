@@ -1,37 +1,41 @@
-CREATE DATABASE db_seguranca_publica;
+SELECT * FROM `db_seguranca_publica`.`municipio`;
+SELECT * FROM `db_seguranca_publica`.`regiao`;
 
-USE db_seguranca_publica;
+ALTER TABLE db_seguranca_publica.municipio
+CHANGE COLUMN `id` `id` INT NOT NULL,
+ADD PRIMARY KEY(`id`),
+ADD COLUMN `id_estado` INT DEFAULT NULL,
+ADD CONSTRAINT `fk_municipio_estado` FOREIGN KEY(`id_estado`) REFERENCES `db_seguranca_publica`.`estados` (`id`)
+ON DELETE RESTRICT
+ON UPDATE RESTRICT;
 
+ALTER TABLE `db_seguranca_publica`.`homicidio`
+DROP PRIMARY KEY,
+ADD PRIMARY KEY(`cod`, `periodo`);
 
-CREATE TABLE `estados`(
-`id_estado` VARCHAR(2) NOT NULL,
-`id_regiao` INT,
-`nome_estado` VARCHAR(50) NOT NULL,
-PRIMARY KEY (`id_estado`)
+DELETE FROM `db_seguranca_publica`.`estados` WHERE `id` = 0;
+
+CREATE VIEW `vw_municipio_por_estado_por_regiao` as (
+SELECT `regiao`.`id_regiao`, `regiao`.`regiao`, `estados`.`id_estado`, `estados`.`estados`, `municipio`.`id_municipio`, `municipio`.`municipio`
+FROM `db_seguranca_publica`.`regiao`, `db_seguranca_publica`.`estados`, `db_seguranca_publica`.`municipio`
+WHERE
+`regiao`.`id_regiao` = `estados`.`cod_regiao` AND `estados`.`id_estado` = `municipio`.`id_estado`
 );
 
+SELECT * FROM `vw_municipio_por_estado_por_regiao`;
 
-CREATE TABLE `municipio`(
-`id_municipio` INT NOT NULL,
-`id_estado` VARCHAR(2),
-`nome_municipio` VARCHAR(100) NOT NULL,
-PRIMARY KEY (`id_municipio`)
-); 
+SELECT CAST(`id` AS CHAR(2)) `id_regiao` FROM `db_seguranca_publica`.`estados`;
+SELECT SUBSTRING(CAST(`id` AS CHAR(2)), 1,1) `id_regiao` FROM `db_seguranca_publica`.`estados`;
 
+SELECT CAST(`id` AS CHAR(7)) `id_municipio` FROM `db_seguranca_publica`.`municipio`;
+SELECT SUBSTRING(CAST(`id` AS CHAR(7)), 1,2) `id_estado` FROM `db_seguranca_publica`.`municipio`;
 
-CREATE TABLE `regiao`(
-`id_regiao` INT NOT NULL,
-`nome_regiao` VARCHAR(50) NOT NULL,
-PRIMARY KEY (`id_regiao`)
-);
+UPDATE `db_seguranca_publica`.`municipio`
+SET
+`id_estado` = SUBSTRING(CAST(`id` AS CHAR(7)), 1,2);
 
+UPDATE `db_seguranca_publica`.`estados`
+SET
+`cod_regiao` = SUBSTRING(CAST(`id` AS CHAR(2)), 1,1);
 
-CREATE TABLE `homicidio`(
-`cod` INT NOT NULL,
-`periodo` YEAR NOT NULL,
-`valor` INT NOT NULL,
-`id_municipio` INT NOT NULL,
-PRIMARY KEY (`cod`, `periodo`)
-);
-  
-DROP TABLE `db_seguranca_publica`.`homicidio`, `db_seguranca_publica`.`municipio`, `db_seguranca_publica`.`estados`, `db_seguranca_publica`.`regiao`;
+COMMIT;
