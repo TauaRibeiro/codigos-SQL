@@ -1,41 +1,57 @@
+CREATE DATABASE db_seguranca_publica;
+
+USE db_seguranca_publica;
+
+CREATE TABLE `homicidio` (
+  `cod` int(11) DEFAULT NULL,
+  `nome` text DEFAULT NULL,
+  `periodo` datetime DEFAULT NULL,
+  `valor` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `municipio` (
+  `id` int(11) DEFAULT NULL,
+  `municipio` text DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `estados` (
+  `id` int(11) NOT NULL,
+  `estados` text DEFAULT NULL,
+  `cod_regiao` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_estado_regiao` (`cod_regiao`),
+  CONSTRAINT `fk_estado_regiao` FOREIGN KEY (`cod_regiao`) REFERENCES `regiao` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `regiao` (
+  `id` int(11) NOT NULL,
+  `nome` text DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
+SELECT * FROM `db_seguranca_publica`.`homicidio`;
+SELECT * FROM `db_seguranca_publica`.`estados`;
 SELECT * FROM `db_seguranca_publica`.`municipio`;
 SELECT * FROM `db_seguranca_publica`.`regiao`;
 
-ALTER TABLE db_seguranca_publica.municipio
-CHANGE COLUMN `id` `id` INT NOT NULL,
-ADD PRIMARY KEY(`id`),
-ADD COLUMN `id_estado` INT DEFAULT NULL,
-ADD CONSTRAINT `fk_municipio_estado` FOREIGN KEY(`id_estado`) REFERENCES `db_seguranca_publica`.`estados` (`id`)
-ON DELETE RESTRICT
-ON UPDATE RESTRICT;
+SELECT * FROM `db_seguranca_publica`.`homicidio` WHERE `periodo` >= 1900;
+SELECT * FROM `db_seguranca_publica`.`estados` WHERE `id_estado` = 11;
+SELECT * FROM `db_seguranca_publica`.`municipio` WHERE `id_municipio` % 2 = 0;
+SELECT * FROM `db_seguranca_publica`.`regiao` WHERE `id_regiao` = 1;
 
-ALTER TABLE `db_seguranca_publica`.`homicidio`
-DROP PRIMARY KEY,
-ADD PRIMARY KEY(`cod`, `periodo`);
+DELETE FROM `db_seguranca_publica`.`estados`
+WHERE `id_estado` = 11;
+DELETE FROM `db_seguranca_publica`.`homicidio`
+WHERE `periodo` >= 1900;
+DELETE FROM `db_seguranca_publica`.`municipio`
+WHERE `id_municipio` % 2 = 0;
+DELETE FROM `db_seguranca_publica`.`regiao`
+WHERE `id_regiao` = 1;
 
-DELETE FROM `db_seguranca_publica`.`estados` WHERE `id` = 0;
-
-CREATE VIEW `vw_municipio_por_estado_por_regiao` as (
-SELECT `regiao`.`id_regiao`, `regiao`.`regiao`, `estados`.`id_estado`, `estados`.`estados`, `municipio`.`id_municipio`, `municipio`.`municipio`
-FROM `db_seguranca_publica`.`regiao`, `db_seguranca_publica`.`estados`, `db_seguranca_publica`.`municipio`
-WHERE
-`regiao`.`id_regiao` = `estados`.`cod_regiao` AND `estados`.`id_estado` = `municipio`.`id_estado`
-);
-
-SELECT * FROM `vw_municipio_por_estado_por_regiao`;
-
-SELECT CAST(`id` AS CHAR(2)) `id_regiao` FROM `db_seguranca_publica`.`estados`;
-SELECT SUBSTRING(CAST(`id` AS CHAR(2)), 1,1) `id_regiao` FROM `db_seguranca_publica`.`estados`;
-
-SELECT CAST(`id` AS CHAR(7)) `id_municipio` FROM `db_seguranca_publica`.`municipio`;
-SELECT SUBSTRING(CAST(`id` AS CHAR(7)), 1,2) `id_estado` FROM `db_seguranca_publica`.`municipio`;
-
-UPDATE `db_seguranca_publica`.`municipio`
-SET
-`id_estado` = SUBSTRING(CAST(`id` AS CHAR(7)), 1,2);
-
-UPDATE `db_seguranca_publica`.`estados`
-SET
-`cod_regiao` = SUBSTRING(CAST(`id` AS CHAR(2)), 1,1);
-
-COMMIT;
+DELETE FROM `db_seguranca_publica`.`estados`;
+DELETE FROM `db_seguranca_publica`.`homicidio`;
+DELETE FROM `db_seguranca_publica`.`municipio`;
+DELETE FROM `db_seguranca_publica`.`regiao`;
