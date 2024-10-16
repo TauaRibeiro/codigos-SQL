@@ -9,29 +9,30 @@ CREATE TABLE `estados` (
   PRIMARY KEY (`id_estado`),
   KEY `fk_estado_regiao` (`cod_regiao`),
   CONSTRAINT `fk_estado_regiao` FOREIGN KEY (`cod_regiao`) REFERENCES `regiao` (`id_regiao`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 CREATE TABLE `homicidio` (
   `cod` int NOT NULL,
   `periodo` year NOT NULL,
   `valor` bigint DEFAULT NULL,
   PRIMARY KEY (`periodo`,`cod`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 CREATE TABLE `municipio` (
+  `id_municipio` int NOT NULL,
   `id_municipio` int NOT NULL,
   `municipio` text,
   `id_estado` int default NULL,
   PRIMARY KEY (`id_municipio`),
   KEY `fk_municipio_estado` (`id_estado`),
   CONSTRAINT `fk_municipio_estado` FOREIGN KEY (`id_estado`) REFERENCES `estados` (`id_estado`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 CREATE TABLE `regiao` (
   `id_regiao` int NOT NULL,
   `nome` text,
   PRIMARY KEY (`id_regiao`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
 
 
 -- ALTERAÇÕES NAS TABELAS
@@ -59,7 +60,7 @@ SELECT * FROM `db_seguranca_publica`.`vw_dados_homicidios`;
 SELECT `id_regiao`, `nome`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
 WHERE `valor` = (SELECT Max(`valor`) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
 SELECT `id_estado`, `estados`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
-WHERE `valor` = (SELECT Max(`valor`) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
+WHERE `valor` = (SELECT Max((SELECT SUM(`valor`) FROM `db_seguranca_publica`.`vw_dados_homicidios`)) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
 SELECT `id_municipio`, `municipio`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
 WHERE `valor` = (SELECT Max(`valor`) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
 
