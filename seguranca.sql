@@ -57,13 +57,21 @@ SELECT CAST(SUBSTRING(`id_municipio`, 1,2) AS CHAR(2)) FROM `db_seguranca_public
 SELECT * FROM `db_seguranca_publica`.`vw_dados_homicidios`;
 
 
-SELECT `id_regiao`, `nome`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
-WHERE `valor` = (SELECT Max(`valor`) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
-SELECT `id_estado`, `estados`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
-WHERE `valor` = (SELECT Max((SELECT SUM(`valor`) FROM `db_seguranca_publica`.`vw_dados_homicidios`)) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
-SELECT `id_municipio`, `municipio`, `periodo`, `valor` AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`
-WHERE `valor` = (SELECT Max(`valor`) AS `maior_valor` FROM `db_seguranca_publica`.`vw_dados_homicidios`);
+CREATE VIEW `vw_total_regiao` AS (
+	SELECT `id_regiao`, `nome`, `periodo`, SUM(`valor`) AS `valor` FROM `vw_dados_homicidios` GROUP BY `id_regiao`, `periodo`, `nome`
+);
 
+CREATE VIEW `vw_total_estados` AS(
+	SELECT `id_estado`, `estados`, `periodo`, SUM(`valor`) AS `valor` FROM `vw_dados_homicidios` GROUP BY `id_estado`, `estados`, `periodo`
+);
+
+CREATE VIEW `vw_total_municipios` AS(
+	SELECT `id_municipio`, `municipio`, `periodo`, SUM(`valor`) AS `valor` FROM `vw_dados_homicidios` GROUP BY `id_municipio`, `municipio`, `periodo`
+);
+
+SELECT `id_municipio`, `municipio`, `periodo`, `valor` FROM `vw_total_municipios` WHERE `valor` = (SELECT MAX(`valor`) FROM `vw_total_municipios`);
+SELECT `id_estado`, `estados`, `periodo`, `valor` FROM `vw_total_estados` WHERE `valor` = (SELECT MAX(`valor`) FROM `vw_total_estados`);
+SELECT `id_regiao`, `nome`, `periodo`, `valor` FROM `vw_total_regiao` WHERE `valor` = (SELECT MAX(`valor`) FROM `vw_total_regiao`);
 
 
 CREATE VIEW `vw_dados_homicidios` AS

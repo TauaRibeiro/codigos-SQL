@@ -82,24 +82,7 @@ CREATE TABLE `usuario` (
 
 -- VIEWS
 
-CREATE VIEW `vw_livros` AS(
-	SELECT 
-	`livro_autor`.`id_livro`, 
-	`livro`.`titulo`, `livro`.`editora`, `livro`.`ano_de_publicacao`, `livro`.`numero_edicao`, `qntd_disponivel`,
-	`categoria`.`nome` AS "categoria",
-	 `autor`.`nome` AS "autor"
-	FROM 
-	`bd_19102024`.`livro_autor`,
-	`bd_19102024`.`livro`,
-	`bd_19102024`.`categoria`,
-	`bd_19102024`.`autor`
-	WHERE(
-	`livro_autor`.`id_livro` = `livro`.`idlivro` AND
-	`livro`.`idcategoria` = `categoria`.`idcategoria` AND
-	`livro_autor`.`id_autor` = `autor`.`idautor`
-	)
-	GROUP BY `id_livro`, `autor`.`nome`
-);
+
 -- SELECTS
 SELECT * FROM `bd_19102024`.`autor`;
 SELECT * FROM `bd_19102024`.`categoria`;
@@ -110,24 +93,16 @@ SELECT * FROM `bd_19102024`.`reserva`;
 SELECT * FROM `bd_19102024`.`usuario`;
 SELECT * FROM `bd_19102024`.`livro_autor`;
 
-SELECT * FROM `bd_19102024`.`vw_livros`;
-
-SELECT 
-`livro_autor`.`id_livro`, 
-`livro`.`titulo`, `livro`.`editora`, `livro`.`ano_de_publicacao`, `livro`.`numero_edicao`, `qntd_disponivel`,
-`categoria`.`nome` AS "categoria",
- `autor`.`nome` AS "autor"
+SELECT
+`usuario`.`nome`, `usuario`.`tipo_usuario`, `usuario`.`email_usuario`, `usuario`.`telefone_usuario`, `usuario`.`data_cadastro`, `usuario`.`endereco`,
+`livro_autor`.`id_livro`, `livro_autor`.`id_autor`,
+``.``
 FROM 
-`bd_19102024`.`livro_autor`,
-`bd_19102024`.`livro`,
-`bd_19102024`.`categoria`,
-`bd_19102024`.`autor`
+`bd_19102024`.`usuario`, `bd_19102024`.`livro_autor`, ``
 WHERE(
-`livro_autor`.`id_livro` = `livro`.`idlivro` AND
-`livro`.`idcategoria` = `categoria`.`idcategoria` AND
-`livro_autor`.`id_autor` = `autor`.`idautor`
+`` AND ``
 )
-GROUP BY `id_livro`, `autor`.`nome`;
+GROUP BY ``;
 
 -- ALTER TABLES
 DROP TABLE `bd_19102024`.`produtos`;
@@ -160,13 +135,16 @@ INSERT INTO `bd_19102024`.`livro`(
 	`idlivro`,
     `titulo`,
     `editora`, 
-    `ano_puvlicacao`,
+    `ano_de_publicacao`,
     `numero_edicao`,
     `qntd_exemplares`,
-    `qntd_dispoivel`
+    `qntd_disponivel`,
+    `idcategoria`
 )
 VALUES
-(1, "ENGENHARIA DE SOFTWARE", 1, "SENAI", 1900-10-02, 24, 20, 10);
+(1, "ENGENHARIA DE SOFTWARE", "SENAI", "1900-10-02", 24, 20, 10, 1),
+(2, "PROGRAMAÇÃO PYTHON", "EDITORA", "2000-10-02", 2, 30, 29, 1),
+(3, "COMO FAZER UMA CHURRASQUEIRA A CONTROLE REMOTO", "ALEATORIO", "1980-10-02", 24, 20, 10, 2);
 
 
 INSERT INTO `bd_19102024`.`autor`(
@@ -217,10 +195,7 @@ DELETE FROM `bd_19102024`.`categoria`;
 DELETE FROM `bd_19102024`.`autor`;
 DELETE FROM `bd_19102024`.`usuario`;
 DELETE FROM `bd_19102024`.`emprestimo`;
+DELETE FROM `bd_19102024`.`livro`;
 
-COMMIT;
-
-DELETE FROM `biblioteca`.`usuario`;
-DELETE FROM `biblioteca`.`usuario` WHERE(`ìd_usuario` = 1);
 
 COMMIT;
