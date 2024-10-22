@@ -81,28 +81,31 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- VIEWS
-
+CREATE VIEW `vw_estatisticas_gerais` AS(
+	SELECT
+	`usuario`.`idusuario`, `usuario`.`nome_usuario`, `usuario`.`tipo_usuario`, `usuario`.`email_usuario`, `usuario`.`telefone_usuario`, `usuario`.`data_cadastro`, `usuario`.`endereco_usuario`,
+	`livro_autor`.`id_livro`, `livro`.`titulo`, `livro`.`idcategoria`, `livro`.`ano_de_publicacao`, `livro`.`numero_edicao`, `livro`.`qntd_exemplares`, `livro`.`qntd_disponivel`,
+	`livro_autor`.`id_autor`, `autor`.`nome`, `autor`.`nacionalidade`, `autor`.`data_nascimento`, `autor`.`biografia`,
+	`emprestimo`.`idemprestimo`, `emprestimo`.`data_emprestimo`, `emprestimo`.`data_devolucao`, `emprestimo`.`status`, `emprestimo`.`multa_atraso`,
+	`reserva`.`id_reserva`, `reserva`.`data_reserva`, `reserva`.`posicao_fila`
+	FROM 
+	`bd_19102024`.`usuario`, `bd_19102024`.`livro_autor`, `bd_19102024`.`livro`, `bd_19102024`.`emprestimo`, `bd_19102024`.`autor`, `bd_19102024`.`reserva`
+	WHERE(
+	`livro_autor`.`id_livro` = `livro`.`idlivro` AND
+	`livro_autor`.`id_autor` = `autor`.`idautor`
+	)
+);
 
 -- SELECTS
 SELECT * FROM `bd_19102024`.`autor`;
 SELECT * FROM `bd_19102024`.`categoria`;
-SELECT * FROM `bd_19102024`.`devolucao`;
 SELECT * FROM `bd_19102024`.`emprestimo`;
 SELECT * FROM `bd_19102024`.`livro`;
 SELECT * FROM `bd_19102024`.`reserva`;
 SELECT * FROM `bd_19102024`.`usuario`;
 SELECT * FROM `bd_19102024`.`livro_autor`;
 
-SELECT
-`usuario`.`nome`, `usuario`.`tipo_usuario`, `usuario`.`email_usuario`, `usuario`.`telefone_usuario`, `usuario`.`data_cadastro`, `usuario`.`endereco`,
-`livro_autor`.`id_livro`, `livro_autor`.`id_autor`,
-``.``
-FROM 
-`bd_19102024`.`usuario`, `bd_19102024`.`livro_autor`, ``
-WHERE(
-`` AND ``
-)
-GROUP BY ``;
+SELECT * FROM `bd_19102024`.`vw_estatisticas_gerais`;
 
 -- ALTER TABLES
 DROP TABLE `bd_19102024`.`produtos`;
@@ -189,6 +192,15 @@ INSERT INTO `bd_19102024`.`emprestimo`(
     `multa_atraso`,
     `status`
 )VALUES(1, 1, 2, "2024-10-19", "2024-10-24", 1,"emprestado");
+
+INSERT INTO `bd_19102024`.`reserva`(
+`id_reserva`,
+`id_usuario`,
+`id_livro`,
+`data_reserva`,
+`posicao_fila`
+)VALUES
+(1, 1, 2, "2024-10-22", 1);
 
 -- DELETES
 DELETE FROM `bd_19102024`.`categoria`;
