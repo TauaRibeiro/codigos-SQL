@@ -81,18 +81,19 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- VIEWS
-CREATE VIEW `vw_estatisticas_gerais` AS(
-	SELECT
-	`usuario`.`idusuario`, `usuario`.`nome_usuario`, `usuario`.`tipo_usuario`, `usuario`.`email_usuario`, `usuario`.`telefone_usuario`, `usuario`.`data_cadastro`, `usuario`.`endereco_usuario`,
-	`livro_autor`.`id_livro`, `livro`.`titulo`, `livro`.`idcategoria`, `livro`.`ano_de_publicacao`, `livro`.`numero_edicao`, `livro`.`qntd_exemplares`, `livro`.`qntd_disponivel`,
-	`livro_autor`.`id_autor`, `autor`.`nome`, `autor`.`nacionalidade`, `autor`.`data_nascimento`, `autor`.`biografia`,
-	`emprestimo`.`idemprestimo`, `emprestimo`.`data_emprestimo`, `emprestimo`.`data_devolucao`, `emprestimo`.`status`, `emprestimo`.`multa_atraso`,
-	`reserva`.`id_reserva`, `reserva`.`data_reserva`, `reserva`.`posicao_fila`
+CREATE VIEW `vw_usuarios_em_atrasos` AS (
+	SELECT 
+	`livro`.`titulo`,
+	`emprestimo`.`idusuario`, `emprestimo`.`data_emprestimo`, `emprestimo`.`data_devolucao`,`emprestimo`.`status`,
+	`usuario`.`nome_usuario`, `usuario`.`email_usuario`, `usuario`.`telefone_usuario`, (`emprestimo`.`data_devolucao` - `emprestimo`.`data_emprestimo`) AS "dias_emprestimo"
 	FROM 
-	`bd_19102024`.`usuario`, `bd_19102024`.`livro_autor`, `bd_19102024`.`livro`, `bd_19102024`.`emprestimo`, `bd_19102024`.`autor`, `bd_19102024`.`reserva`
+	`bd_19102024`.`livro`, `bd_19102024`.`usuario`, `bd_19102024`.`emprestimo`
 	WHERE(
-	`livro_autor`.`id_livro` = `livro`.`idlivro` AND
-	`livro_autor`.`id_autor` = `autor`.`idautor`
+	`emprestimo`.`idusuario` = `usuario`.`idusuario` AND
+	`emprestimo`.`idlivro` = `livro`.`idlivro` AND
+	(CAST(sysdate() AS DATE) - `emprestimo`.`data_emprestimo`) > 5 AND 
+	sysdate() > `emprestimo`.`data_devolucao` AND
+	`emprestimo`.`status` = "emprestado"
 	)
 );
 
@@ -106,11 +107,25 @@ SELECT * FROM `bd_19102024`.`usuario`;
 SELECT * FROM `bd_19102024`.`livro_autor`;
 
 SELECT * FROM `bd_19102024`.`vw_estatisticas_gerais`;
+SELECT `titulo`, `nome_usuario`, `email_usuario`, `telefone_usuario`, `dias_emprestimo` FROM `bd_19102024`.`vw_usuarios_em_atrasos`;
+
+
+SELECT 
+`livro`.`titulo`, `categoria`.`nome` AS "categoria"
+FROM 
+`bd_19102024`.`emprestimo`, `bd_19102024`.`livro`, `bd_19102024`.`categoria`
+WHERE(
+`emprestimo`.`idlivro` = `livro`.`idlivro` AND
+`livro`.`idcategoria` = `categoria`.`idcategoria`
+)GROUP BY `livro`.`titulo`;
+
 
 -- ALTER TABLES
 DROP TABLE `bd_19102024`.`produtos`;
 DROP TABLE `bd_19102024`.`itensvenda`;
 DROP TABLE `bd_19102024`.`devolucao`;
+DROP VIEW `bd_19102024`.`vw_usuarios_em_atrasos`;
+
 
 ALTER TABLE `bd_19102024`.`livro`
 	DROP CONSTRAINT `fk_autor_livro`,
@@ -191,7 +206,9 @@ INSERT INTO `bd_19102024`.`emprestimo`(
     `data_devolucao`,
     `multa_atraso`,
     `status`
-)VALUES(1, 1, 2, "2024-10-19", "2024-10-24", 1,"emprestado");
+)VALUES
+(4, 2, 1, "2022-10-20", "2022-10-22", 540, "emprestado"),
+(5, 2, 3, "2020-10-15", "2020-11-15", 540, "devolvido");
 
 INSERT INTO `bd_19102024`.`reserva`(
 `id_reserva`,
@@ -211,3 +228,4 @@ DELETE FROM `bd_19102024`.`livro`;
 
 
 COMMIT;
+
