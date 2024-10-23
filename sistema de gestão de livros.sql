@@ -3,25 +3,25 @@ use BD_19102024;
 -- CREATES
 
 CREATE TABLE `autor` (
-  `idautor` int(11) NOT NULL,
+  `idautor` int NOT NULL,
   `nome` varchar(255) NOT NULL,
   `nacionalidade` varchar(255) NOT NULL,
-  `data_nascimento` int(11) NOT NULL,
+  `data_nascimento` date NOT NULL,
   `biografia` varchar(255) NOT NULL,
   PRIMARY KEY (`idautor`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `categoria` (
-  `idcategoria` int(11) NOT NULL,
+  `idcategoria` int NOT NULL,
   `nome` varchar(255) NOT NULL,
   `descricao` varchar(255) NOT NULL,
   PRIMARY KEY (`idcategoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `emprestimo` (
-  `idemprestimo` int(11) NOT NULL,
-  `idusuario` int(11) NOT NULL,
-  `idlivro` int(11) NOT NULL,
+  `idemprestimo` int NOT NULL,
+  `idusuario` int NOT NULL,
+  `idlivro` int NOT NULL,
   `data_emprestimo` date NOT NULL,
   `data_devolucao` date NOT NULL,
   `status` varchar(255) NOT NULL,
@@ -29,27 +29,27 @@ CREATE TABLE `emprestimo` (
   PRIMARY KEY (`idemprestimo`),
   KEY `fk_livro_emprestimo` (`idlivro`),
   KEY `fk_usuario_emprestimo` (`idusuario`),
-  CONSTRAINT `fk_livro_emprestimo` FOREIGN KEY (`idlivro`) REFERENCES `livro` (`idlivro`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_livro_emprestimo` FOREIGN KEY (`idlivro`) REFERENCES `livro` (`idlivro`),
   CONSTRAINT `fk_usuario_emprestimo` FOREIGN KEY (`idusuario`) REFERENCES `usuario` (`idusuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `livro` (
-  `idlivro` int(11) NOT NULL,
+  `idlivro` int NOT NULL,
   `titulo` varchar(255) NOT NULL,
-  `idcategoria` int(11) NOT NULL,
+  `idcategoria` int NOT NULL,
   `editora` varchar(255) NOT NULL,
   `ano_de_publicacao` date NOT NULL,
-  `numero_edicao` int(11) NOT NULL,
-  `qntd_exemplares` int(11) NOT NULL,
-  `qntd_disponivel` int(11) NOT NULL,
+  `numero_edicao` int NOT NULL,
+  `qntd_exemplares` int NOT NULL,
+  `qntd_disponivel` int NOT NULL,
   PRIMARY KEY (`idlivro`),
   KEY `fk_categoria_livro` (`idcategoria`),
   CONSTRAINT `fk_categoria_livro` FOREIGN KEY (`idcategoria`) REFERENCES `categoria` (`idcategoria`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `livro_autor` (
-  `id_livro` int(11) NOT NULL,
-  `id_autor` int(11) NOT NULL,
+  `id_livro` int NOT NULL,
+  `id_autor` int NOT NULL,
   PRIMARY KEY (`id_livro`,`id_autor`),
   KEY `fk_livro_autor(autor)` (`id_autor`),
   CONSTRAINT `fk_livro_autor(autor)` FOREIGN KEY (`id_autor`) REFERENCES `autor` (`idautor`),
@@ -57,24 +57,24 @@ CREATE TABLE `livro_autor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `reserva` (
-  `id_reserva` int(11) NOT NULL,
-  `id_usuario` int(11) NOT NULL,
-  `id_livro` int(11) NOT NULL,
+  `id_reserva` int NOT NULL,
+  `id_usuario` int NOT NULL,
+  `id_livro` int NOT NULL,
   `data_reserva` date NOT NULL,
-  `posicao_fila` int(11) NOT NULL,
+  `posicao_fila` int NOT NULL,
   PRIMARY KEY (`id_reserva`),
   KEY `fk_usuario_reserva` (`id_usuario`),
   KEY `fk_livro_reserva` (`id_livro`),
   CONSTRAINT `fk_livro_reserva` FOREIGN KEY (`id_livro`) REFERENCES `livro` (`idlivro`),
-  CONSTRAINT `fk_usuario_reserva` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`idusuario`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_usuario_reserva` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`idusuario`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `usuario` (
-  `idusuario` int(11) NOT NULL,
+  `idusuario` int NOT NULL,
   `nome_usuario` varchar(45) NOT NULL,
   `tipo_usuario` varchar(45) NOT NULL,
   `email_usuario` varchar(45) NOT NULL,
-  `telefone_usuario` int(11) NOT NULL,
+  `telefone_usuario` int NOT NULL,
   `data_cadastro` date NOT NULL,
   `endereco_usuario` varchar(255) NOT NULL,
   PRIMARY KEY (`idusuario`)
@@ -97,6 +97,20 @@ CREATE VIEW `vw_usuarios_em_atrasos` AS (
 	)
 );
 
+CREATE VIEW `vw_quantidade_livros_emprestados` AS(
+	SELECT 
+	`livro`.`titulo`, `categoria`.`nome` AS "categoria", COUNT(*) AS "quantidade_emprestimos"
+	FROM 
+	`bd_19102024`.`emprestimo`, `bd_19102024`.`livro`, `bd_19102024`.`categoria`
+	WHERE(
+	`emprestimo`.`idlivro` = `livro`.`idlivro` AND
+	`livro`.`idcategoria` = `categoria`.`idcategoria`
+	)
+	GROUP BY 
+	`livro`.`titulo`, `categoria`.`nome`
+	ORDER BY COUNT(*) DESC
+);
+
 -- SELECTS
 SELECT * FROM `bd_19102024`.`autor`;
 SELECT * FROM `bd_19102024`.`categoria`;
@@ -106,18 +120,8 @@ SELECT * FROM `bd_19102024`.`reserva`;
 SELECT * FROM `bd_19102024`.`usuario`;
 SELECT * FROM `bd_19102024`.`livro_autor`;
 
-SELECT * FROM `bd_19102024`.`vw_estatisticas_gerais`;
 SELECT `titulo`, `nome_usuario`, `email_usuario`, `telefone_usuario`, `dias_emprestimo` FROM `bd_19102024`.`vw_usuarios_em_atrasos`;
-
-
-SELECT 
-`livro`.`titulo`, `categoria`.`nome` AS "categoria"
-FROM 
-`bd_19102024`.`emprestimo`, `bd_19102024`.`livro`, `bd_19102024`.`categoria`
-WHERE(
-`emprestimo`.`idlivro` = `livro`.`idlivro` AND
-`livro`.`idcategoria` = `categoria`.`idcategoria`
-)GROUP BY `livro`.`titulo`;
+SELECT * FROM `bd_19102024`.`vw_quantidade_livros_emprestados`;
 
 
 -- ALTER TABLES
@@ -207,8 +211,8 @@ INSERT INTO `bd_19102024`.`emprestimo`(
     `multa_atraso`,
     `status`
 )VALUES
-(4, 2, 1, "2022-10-20", "2022-10-22", 540, "emprestado"),
-(5, 2, 3, "2020-10-15", "2020-11-15", 540, "devolvido");
+(2, 2, 3, "2024-10-10", "2024-10-20", 540, "emprestado"),
+(3, 1, 1, "2024-10-18", "2024-10-23", 540, "emprestado");
 
 INSERT INTO `bd_19102024`.`reserva`(
 `id_reserva`,
