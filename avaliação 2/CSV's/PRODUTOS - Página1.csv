@@ -1,0 +1,11 @@
+id,nome,preco,estoque
+1,produto 1,"100.00",20
+2,produto 2,"100.50",30
+3,produto 3,"101.00",40
+4,produto 4,"101.50",50
+5,produto 5,"102.00",60
+6,produto 6,"102.50",70
+7,produto 7,"103.00",80
+8,produto 8,"103.50",90
+9,produto 9,"104.00",100
+10,produto 10,"104.50",110

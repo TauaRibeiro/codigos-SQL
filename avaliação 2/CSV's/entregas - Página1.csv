@@ -1,0 +1,11 @@
+id,pedido,transportadora,data,status
+1,1,1,2024/10/24,entregue
+2,2,2,2024/10/25,entregue
+3,3,3,2024/10/26,entregue
+4,4,4,2024/10/27,entregue
+5,5,5,2024/10/28,entregue
+6,6,6,2024/10/29,entregue
+7,7,7,2024/10/30,entregue
+8,8,8,2024/10/31,entregue
+9,9,9,2024/11/1,a caminho
+10,10,10,2024/11/2,a caminho
